@@ -1,0 +1,75 @@
+---
+title: "Mathematics of Addition: The Foundational Reference"
+author: "Siddarth Kumar"
+date: "2026-09-12"
+format:
+  html:
+    toc: true
+    theme: cosmo
+  pdf:
+    documentclass: scrbook
+    toc: true
+---
+
+# 1. The Deterministic Taxonomy of Numbers
+
+Before adding numbers, we must define the universe of numbers. Mathematics organizes numbers into strict, deterministic sets.
+
+*   **Natural Numbers ($\mathbb{N}$):** The counting numbers starting from 1.
+*   **Whole Numbers ($\mathbb{W}$):** Natural numbers plus zero.
+*   **Integers ($\mathbb{Z}$):** Whole numbers and their negative counterparts. In programming, this maps to the `int` data type.
+*   **Rational Numbers ($\mathbb{Q}$):** Any number that can be expressed as a perfect fraction $\frac{p}{q}$ where $p$ and $q$ are integers.
+*   **Irrational Numbers ($\mathbb{I}$):** Numbers that cannot be expressed as simple fractions. Their decimals go on forever without repeating (e.g., $\pi, \sqrt{2}$).
+*   **Real Numbers ($\mathbb{R}$):** The combination of all Rational and Irrational numbers. In programming, we approximate these using the `float` (floating-point) data type.
+*   **Complex Numbers ($\mathbb{C}$):** Numbers with a real part and an imaginary part (e.g., $3 + 4i$).
+
+---
+
+# 2. Step-by-Step Mathematical Logic of Addition
+
+## Scenario A: Adding Integers (`int`)
+
+At the most fundamental level, integer addition is defined recursively by counting using the Peano Axioms.
+
+**1. Base Case:** Any number added to zero remains itself.
+$$
+a + 0 = a
+$$
+
+**2. Successor Case:** Adding numbers is essentially stepping forward on the number line. To add $a + b$, you start at $a$ and take $b$ forward steps.
+$$
+a + S(b) = S(a+b)
+$$
+
+::: {.callout-tip title="The 2-Year-Old Explanation"}
+If you have 3 apples in one basket and 2 apples in another, you put them all in a big basket and count them one by one: 1, 2, 3, 4, 5.
+:::
+
+## Scenario B: Adding Real Numbers (`float`)
+
+Computers cannot store infinite decimals. They store floats using scientific notation. Adding floats (IEEE 754 Standard) is fundamentally different from adding integers.
+
+$$
+\text{Float} = \text{Significand} \times 2^{\text{Exponent}}
+$$
+
+1.  **Compare Exponents:** Look at the exponent of both numbers.
+2.  **Align (Shift):** Shift the decimal (mantissa) of the smaller number to the right until its exponent matches the larger number's exponent.
+3.  **Add:** Add the significands (mantissas) together.
+4.  **Normalize:** Shift the decimal of the result back to standard scientific notation.
+
+::: {.callout-warning title="Precision Loss"}
+Because floats are approximations, adding $0.1 + 0.2$ in most programming languages will result in $0.30000000000000004$ due to binary alignment rounding.
+:::
+
+## Scenario C: Adding Complex Numbers
+
+Complex numbers take the form $a + bi$. They are added vectorially by grouping real and imaginary parts.
+
+1.  **Group:** Separate the Real parts from the Imaginary parts.
+2.  **Add Real:** Add the real components together.
+3.  **Add Imaginary:** Add the imaginary components together.
+4.  **Combine:**
+$$
+(a_1 + a_2) + (b_1 + b_2)i
+$$
