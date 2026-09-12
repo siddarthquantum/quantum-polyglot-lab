@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Java
+*.class
+.gradle/
+build/
+out/
+
+# C / C++
+*.o
+*.obj
+*.out
+a.out
+build/
+
+# Rust
+target/
+
+# IDE
+.vscode/
+.idea/
+
+# Quarto
+_book/
+_site/
+.quarto/
+
+# OS
+.DS_Store
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
