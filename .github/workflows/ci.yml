@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1" # weekly CodeQL re-scan, Mondays 03:17 UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  c:
+    name: C — build (warnings as errors) + tests under ASan/UBSan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with sanitizers
+        run: |
+          gcc -std=c11 -Wall -Wextra -Werror -O1 -g \
+              -fsanitize=address,undefined -fno-omit-frame-pointer \
+              -o graph_traversals c/graph_lab/graph_traversals.c
+      - name: Run tests
+        run: c/graph_lab/tests/run_tests.sh ./graph_traversals
+
+  python:
+    name: Python — lint + compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check python/
+      - run: ruff format --check python/
+      - run: python -m compileall -q python/
+
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            detect --source /repo --redact --verbose
+
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: c-cpp
+            build-mode: manual
+          - language: python
+            build-mode: none
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: security-extended
+      - if: matrix.build-mode == 'manual'
+        run: gcc -std=c11 -o /tmp/graph_traversals c/graph_lab/graph_traversals.c
+      - uses: github/codeql-action/analyze@v3

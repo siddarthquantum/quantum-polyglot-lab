@@ -40,3 +40,7 @@ _site/
 *.pem
 *.key
 secrets/
+
+# Compiled C binaries (no extension)
+c/**/graph
+c/**/graph_traversals

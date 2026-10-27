@@ -1,18 +1,28 @@
-import pandas as pd
+import sys
+from pathlib import Path
+
 import matplotlib
-matplotlib.use('Agg')
+import pandas as pd
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
+import numpy as np
+from sklearn.cluster import DBSCAN, AgglomerativeClustering, KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import DBSCAN, AgglomerativeClustering
-import numpy as np
 
 # 1. Load and prepare the dataset
-df = pd.read_csv('CC GENERAL.csv')
+# Pass the CSV path as an argument, or keep "CC GENERAL.csv" next to this script
+DATA_PATH = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).parent / "CC GENERAL.csv"
+if not DATA_PATH.exists():
+    sys.exit(
+        f"Dataset not found: {DATA_PATH}\n"
+        "Download the Kaggle 'Credit Card Dataset for Clustering' and pass its path."
+    )
+df = pd.read_csv(DATA_PATH)
 
 # Drop CUST_ID as it is merely an identifier, not a behavioral variable
-df = df.drop('CUST_ID', axis=1)
+df = df.drop("CUST_ID", axis=1)
 
 # Handle missing values by filling them with the column mean
 df.fillna(df.mean(), inplace=True)
@@ -45,29 +55,29 @@ for k in K:
 fig, ax = plt.subplots(2, 2, figsize=(14, 10))
 
 # Elbow Method plots
-ax[0, 0].plot(K, wcss_unscaled, 'bo-')
-ax[0, 0].set_title('Elbow Method (Unscaled Data)')
-ax[0, 0].set_xlabel('Number of clusters (k)')
-ax[0, 0].set_ylabel('WCSS')
+ax[0, 0].plot(K, wcss_unscaled, "bo-")
+ax[0, 0].set_title("Elbow Method (Unscaled Data)")
+ax[0, 0].set_xlabel("Number of clusters (k)")
+ax[0, 0].set_ylabel("WCSS")
 
-ax[0, 1].plot(K, wcss_scaled, 'ro-')
-ax[0, 1].set_title('Elbow Method (Scaled Data)')
-ax[0, 1].set_xlabel('Number of clusters (k)')
-ax[0, 1].set_ylabel('WCSS')
+ax[0, 1].plot(K, wcss_scaled, "ro-")
+ax[0, 1].set_title("Elbow Method (Scaled Data)")
+ax[0, 1].set_xlabel("Number of clusters (k)")
+ax[0, 1].set_ylabel("WCSS")
 
 # Silhouette Score plots
-ax[1, 0].plot(K, silhouette_unscaled, 'bo-')
-ax[1, 0].set_title('Silhouette Score (Unscaled Data)')
-ax[1, 0].set_xlabel('Number of clusters (k)')
-ax[1, 0].set_ylabel('Score')
+ax[1, 0].plot(K, silhouette_unscaled, "bo-")
+ax[1, 0].set_title("Silhouette Score (Unscaled Data)")
+ax[1, 0].set_xlabel("Number of clusters (k)")
+ax[1, 0].set_ylabel("Score")
 
-ax[1, 1].plot(K, silhouette_scaled, 'ro-')
-ax[1, 1].set_title('Silhouette Score (Scaled Data)')
-ax[1, 1].set_xlabel('Number of clusters (k)')
-ax[1, 1].set_ylabel('Score')
+ax[1, 1].plot(K, silhouette_scaled, "ro-")
+ax[1, 1].set_title("Silhouette Score (Scaled Data)")
+ax[1, 1].set_xlabel("Number of clusters (k)")
+ax[1, 1].set_ylabel("Score")
 
 plt.tight_layout()
-plt.savefig('clustering_plot.png')
+plt.savefig("clustering_plot.png")
 
 print(f"Max Silhouette Score (Unscaled): {max(silhouette_unscaled):.4f}")
 print(f"Max Silhouette Score (Scaled): {max(silhouette_scaled):.4f}")
@@ -89,22 +99,13 @@ else:
     print("DBSCAN found only 1 cluster or only noise.")
 
 print("\n--- Agglomerative Clustering ---")
-# We will use k=4 as a common baseline for this dataset, adjust if your Elbow graph looked different!
-optimal_k = 4 
-agg_cluster = AgglomerativeClustering(n_clusters=optimal_k)
-agg_labels = agg_cluster.fit_predict(df_scaled)
-agg_silhouette = silhouette_score(df_scaled, agg_labels)
-
-print(f"Agglomerative Silhouette Score (k={optimal_k}): {agg_silhouette:.4f}")
-
-
-print("\n--- Agglomerative Clustering ---")
-# Take a random sample of 2000 customers to prevent the system from hanging
+# Agglomerative clustering is O(n^2) in memory, so running it on all ~9,000 rows
+# can hang. Take a random sample of 2000 customers to prevent the system from hanging
 np.random.seed(42)
 sample_indices = np.random.choice(df_scaled.shape[0], size=2000, replace=False)
 df_scaled_sample = df_scaled[sample_indices]
 
-optimal_k = 4 
+optimal_k = 4  # baseline from the elbow plot; adjust if yours differs
 agg_cluster = AgglomerativeClustering(n_clusters=optimal_k)
 agg_labels = agg_cluster.fit_predict(df_scaled_sample)
 agg_silhouette = silhouette_score(df_scaled_sample, agg_labels)
