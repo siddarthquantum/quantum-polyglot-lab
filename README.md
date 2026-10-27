@@ -1,5 +1,8 @@
 # Quantum Polyglot Lab
-#sichakra.in
+
+[![CI](https://github.com/siddarthquantum/quantum-polyglot-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/siddarthquantum/quantum-polyglot-lab/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/site-sichakra.in-0A66C2)](https://sichakra.in)
 
 > **Mathematics → Algorithms → Python → Java → C → Rust → Testing → Security → Quantum Computing**
 
@@ -204,66 +207,46 @@ Record books, papers, standards and other authoritative sources.
 
 # Repository Structure
 
+What is in the repository today:
+
 ```text
 quantum-polyglot-lab/
+├── README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CHANGELOG.md
+├── ruff.toml                      # Python lint rules (incl. security checks)
+├── .github/workflows/ci.yml       # build, tests, CodeQL, secret scanning
 │
-├── README.md
-├── LICENSE
-├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
-├── SECURITY.md
-├── CHANGELOG.md
-├── .gitignore
+├── c/
+│   └── graph_lab/                 # BFS + DFS on an adjacency matrix
+│       ├── graph_traversals.c
+│       └── tests/                 # shared input/expected-output cases + runner
 │
-├── src/
-│   ├── day01/
-│   │   ├── python/
-│   │   ├── java/
-│   │   ├── c/
-│   │   └── rust/
-│   ├── day02/
-│   └── ...
-│
-├── tests/
-│   ├── day01/
-│   ├── day02/
-│   └── ...
+├── python/
+│   └── kmeanLab4/                 # K-Means, DBSCAN, agglomerative clustering
 │
 ├── book/
-│   ├── _quarto.yml
-│   ├── index.qmd
-│   ├── days/
-│   ├── references.bib
-│   └── styles/
+│   └── 00-math-foundations.qmd    # Quarto chapter: the mathematics of addition
 │
-├── docs/
-│   ├── learning-roadmap.md
-│   ├── secure-coding.md
-│   ├── highlights.md
-│   └── mistakes.md
-│
-├── scripts/
-│
-└── .github/
-    └── workflows/
+└── docs/                          # roadmap, secure coding, highlights, mistakes
+```
+
+As the 60-day foundation progresses, each problem gets its own folder with all four
+language implementations side by side, plus `java/` and `rust/` directories:
+
+```text
+<lang>/<problem>/        e.g. c/graph_lab, python/graph_lab, java/graph_lab, rust/graph_lab
+<lang>/<problem>/tests/  shared cases every implementation must pass
 ```
 
 ### Directory responsibilities
 
-**`src/`**
-Authoritative source code for the four language implementations.
-
-**`tests/`**
-Shared test cases and verification data.
+**`c/`, `python/`** (and later `java/`, `rust/`)
+Source code, one folder per problem, with its tests alongside.
 
 **`book/`**
 Quarto source used to build the educational book.
 
 **`docs/`**
 Learning notes, principles, highlights and mistakes.
-
-**`scripts/`**
-Repeatable local development and verification commands.
 
 **`.github/`**
 Continuous integration and security automation.
@@ -433,18 +416,14 @@ The repository contains the bibliography required by the book rather than the co
 
 The educational content is written as Quarto Markdown (`.qmd`) and maintained separately from the source-code implementations.
 
-The authoritative code remains under:
-
-```text
-src/
-```
+The authoritative code remains in the language folders (`c/`, `python/`, and later `java/`, `rust/`).
 
 The book references those source files rather than maintaining unnecessary duplicate copies.
 
 Conceptually:
 
 ```text
-src/
+code
  │
  ├── Python
  ├── Java
@@ -586,16 +565,24 @@ When contributors join the project, required reviews and additional branch prote
 
 The repository is designed to progressively use GitHub-native automation.
 
-Planned quality gates include:
+Running today on every push and pull request
+([`ci.yml`](.github/workflows/ci.yml)):
+
+| Gate | What it checks |
+|---|---|
+| C build | `gcc -Wall -Wextra -Werror` — any warning fails the build |
+| C tests | Shared test cases run under AddressSanitizer + UndefinedBehaviorSanitizer |
+| Python | `ruff` lint (incl. bandit-style security rules), formatting, compile check |
+| CodeQL | `security-extended` static analysis for C and Python, plus a weekly re-scan |
+| Secrets | `gitleaks` across the full git history |
+
+Planned as Java and Rust implementations land:
 
 ```text
-Python tests/linting
 Java compilation/tests
-C compilation/tests
-Rust formatting/linting/tests
-CodeQL security analysis
-Dependency updates
-Quarto rendering
+Rust fmt / clippy / tests
+Dependabot dependency updates
+Quarto book rendering
 ```
 
 The initial project deliberately avoids unnecessary infrastructure.

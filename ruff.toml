@@ -1,0 +1,9 @@
+target-version = "py312"
+line-length = 100
+
+[lint]
+# pycodestyle, pyflakes, import order, bugbear, and bandit-style security checks
+select = ["E", "F", "I", "B", "S"]
+ignore = [
+    "E402", # matplotlib.use() must run before importing pyplot
+]

@@ -6,9 +6,16 @@ int adj[MAX][MAX];   // Adjacency matrix to store the graph
 int visited[MAX];    // Keeps track of visited vertices
 int V, E;            // Number of vertices and edges
 
+// Returns 1 if x is a valid vertex index for the current graph
+static int is_valid_vertex(int x)
+{
+    return x >= 0 && x < V;
+}
+
 // BFS traversal using a queue
 void BFS(int start)
 {
+    // Each vertex is enqueued at most once, so MAX slots are enough
     int queue[MAX];
     int front = 0, rear = -1;
     int u, v;
@@ -31,7 +38,7 @@ void BFS(int start)
 
         // Visit and print the vertex
         printf("%d ", u);
-        
+
         // Check all adjacent vertices in ascending order
         for (v = 0; v < V; v++)
         {
@@ -53,7 +60,9 @@ void BFS(int start)
 // DFS traversal using a stack
 void DFS(int start)
 {
-    int stack[MAX];
+    // A vertex can be pushed once per incoming edge before it is visited,
+    // so the stack can hold up to V*V entries, not just V.
+    static int stack[MAX * MAX];
     int top = -1;
     int u, v;
 
@@ -71,7 +80,7 @@ void DFS(int start)
     {
         // Remove the top vertex from the stack
         u = stack[top--];
-       
+
         // Process the vertex only if it is unvisited
         if (visited[u] == 0)
         {
@@ -80,13 +89,13 @@ void DFS(int start)
 
             // Print the visited vertex
             printf("%d ", u);
-           
+
             // Check adjacent vertices in descending order
             // so that the smallest vertex is pushed last and processed first
             for (v = V - 1; v >= 0; v--)
             {
                 // If an edge exists and the vertex is unvisited
-                if (adj[u][v] == 1 && visited[v] == 0)
+                if (adj[u][v] == 1 && visited[v] == 0 && top < MAX * MAX - 1)
                 {
                     // Push the adjacent vertex onto the stack
                     stack[++top] = v;
@@ -98,17 +107,26 @@ void DFS(int start)
     printf("\n");
 }
 
-int main()
+int main(void)
 {
     int u, v, start;
 
-    // Read the number of vertices and edges
-    scanf("%d %d", &V, &E);
+    // Read the number of vertices and edges, and reject values that
+    // would overflow the fixed-size arrays
+    if (scanf("%d %d", &V, &E) != 2 || V <= 0 || V > MAX || E < 0)
+    {
+        fprintf(stderr, "error: expected 1 <= V <= %d and E >= 0\n", MAX);
+        return 1;
+    }
 
     // Read each edge and update the adjacency matrix
     for (int i = 0; i < E; i++)
     {
-        scanf("%d %d", &u, &v);
+        if (scanf("%d %d", &u, &v) != 2 || !is_valid_vertex(u) || !is_valid_vertex(v))
+        {
+            fprintf(stderr, "error: edge %d must use vertices in [0, %d)\n", i + 1, V);
+            return 1;
+        }
 
         // The graph is undirected, so add both directions
         adj[u][v] = 1;
@@ -116,7 +134,11 @@ int main()
     }
 
     // Read the starting vertex
-    scanf("%d", &start);
+    if (scanf("%d", &start) != 1 || !is_valid_vertex(start))
+    {
+        fprintf(stderr, "error: start vertex must be in [0, %d)\n", V);
+        return 1;
+    }
 
     // Perform BFS traversal
     BFS(start);
