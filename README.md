@@ -216,6 +216,10 @@ quantum-polyglot-lab/
 ├── .github/workflows/ci.yml       # build, tests, CodeQL, secret scanning
 │
 ├── c/
+│   ├── array_lab/                 # array operations: exercise, solution, 22 tests
+│   │   ├── array_ops.c            # exercise file (fill in the TODOs)
+│   │   ├── solution/array_ops.c   # reference solution
+│   │   └── tests/
 │   └── graph_lab/                 # BFS + DFS on an adjacency matrix
 │       ├── graph_traversals.c
 │       └── tests/                 # shared input/expected-output cases + runner

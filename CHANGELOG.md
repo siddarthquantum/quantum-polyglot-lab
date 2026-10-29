@@ -5,6 +5,7 @@ All notable changes to this project are recorded here. The format follows [Keep 
 ## [Unreleased]
 
 ### Added
+- **C array lab:** exercise file with ten array operations to implement (print, insert, delete, linear and binary search, insertion sort, reverse, rotate, max/min/sum), a reference solution, and 22 shared test cases covering empty and full arrays, invalid positions, `long long` sums and malformed input. CI compiles the exercise and tests the solution under ASan/UBSan.
 - GitHub Actions CI: C build with warnings as errors, tests under ASan/UBSan, Python lint, CodeQL and gitleaks secret scanning.
 - Shared test runner and cases for the C graph traversal lab, including invalid-input and dense-graph cases.
 - Contributing guide, security policy, code of conduct and this changelog.
