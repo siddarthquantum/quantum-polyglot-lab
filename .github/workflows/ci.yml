@@ -27,6 +27,16 @@ jobs:
               -o graph_traversals c/graph_lab/graph_traversals.c
       - name: Run tests
         run: c/graph_lab/tests/run_tests.sh ./graph_traversals
+      - name: Build array lab (exercise must compile; solution must pass)
+        run: |
+          gcc -std=c11 -Wall -Wextra -Werror -O1 -g \
+              -fsanitize=address,undefined -fno-omit-frame-pointer \
+              -o array_ops_exercise c/array_lab/array_ops.c
+          gcc -std=c11 -Wall -Wextra -Werror -O1 -g \
+              -fsanitize=address,undefined -fno-omit-frame-pointer \
+              -o array_ops c/array_lab/solution/array_ops.c
+      - name: Run array lab tests
+        run: c/array_lab/tests/run_tests.sh ./array_ops
 
   python:
     name: Python — lint + compile
@@ -75,5 +85,7 @@ jobs:
           build-mode: ${{ matrix.build-mode }}
           queries: security-extended
       - if: matrix.build-mode == 'manual'
-        run: gcc -std=c11 -o /tmp/graph_traversals c/graph_lab/graph_traversals.c
+        run: |
+          gcc -std=c11 -o /tmp/graph_traversals c/graph_lab/graph_traversals.c
+          gcc -std=c11 -o /tmp/array_ops c/array_lab/solution/array_ops.c
       - uses: github/codeql-action/analyze@v3

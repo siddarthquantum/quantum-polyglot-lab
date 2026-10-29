@@ -1,0 +1,11 @@
+Deleted 10
+Array: 20 30 40 50
+Deleted 50
+Array: 20 30 40
+Deleted 30
+Array: 20 40
+Invalid position
+Deleted 20
+Deleted 40
+Underflow
+Array: (empty)

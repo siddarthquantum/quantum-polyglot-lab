@@ -44,3 +44,5 @@ secrets/
 # Compiled C binaries (no extension)
 c/**/graph
 c/**/graph_traversals
+c/**/array_ops
+c/**/array_ops_exercise

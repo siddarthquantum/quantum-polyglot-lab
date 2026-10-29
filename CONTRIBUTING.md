@@ -23,6 +23,8 @@ Thanks for your interest in Quantum Polyglot Lab. Every contribution follows the
    # C
    gcc -std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined -o graph c/graph_lab/graph_traversals.c
    c/graph_lab/tests/run_tests.sh ./graph
+   gcc -std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined -o array_ops c/array_lab/solution/array_ops.c
+   c/array_lab/tests/run_tests.sh ./array_ops
    # Python
    ruff check python/ && ruff format --check python/
    ```
