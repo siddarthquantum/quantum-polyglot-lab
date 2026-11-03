@@ -38,6 +38,22 @@ jobs:
       - name: Run array lab tests
         run: c/array_lab/tests/run_tests.sh ./array_ops
 
+  array_basics:
+    name: Array basics — C, Java, Python, Rust must print identical output
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build all four (warnings as errors), compare output, run Rust unit tests
+        run: shared/array_basics/run_all.sh
+
   python:
     name: Python — lint + compile
     runs-on: ubuntu-latest
@@ -88,4 +104,5 @@ jobs:
         run: |
           gcc -std=c11 -o /tmp/graph_traversals c/graph_lab/graph_traversals.c
           gcc -std=c11 -o /tmp/array_ops c/array_lab/solution/array_ops.c
+          gcc -std=c11 -o /tmp/array_basics c/array_basics/array_basics.c
       - uses: github/codeql-action/analyze@v3

@@ -215,7 +215,14 @@ quantum-polyglot-lab/
 ├── ruff.toml                      # Python lint rules (incl. security checks)
 ├── .github/workflows/ci.yml       # build, tests, CodeQL, secret scanning
 │
+├── shared/
+│   └── array_basics/              # START HERE: traverse/insert/delete in C, Java, Python, Rust
+│       ├── README.md              # beginner guide: Big-O, complexity table, speed + safety comparison
+│       ├── expected_demo.txt      # all four languages must print exactly this
+│       └── run_all.sh             # build all 4, verify output, `bench` for timings
+│
 ├── c/
+│   ├── array_basics/              # C version of shared/array_basics
 │   ├── array_lab/                 # array operations: exercise, solution, 22 tests
 │   │   ├── array_ops.c            # exercise file (fill in the TODOs)
 │   │   ├── solution/array_ops.c   # reference solution
@@ -224,7 +231,11 @@ quantum-polyglot-lab/
 │       ├── graph_traversals.c
 │       └── tests/                 # shared input/expected-output cases + runner
 │
+├── java/array_basics/             # Java version
+├── rust/array_basics/             # Rust version (with unit tests)
+│
 ├── python/
+│   ├── array_basics/              # Python version
 │   └── kmeanLab4/                 # K-Means, DBSCAN, agglomerative clustering
 │
 ├── book/
@@ -233,8 +244,8 @@ quantum-polyglot-lab/
 └── docs/                          # roadmap, secure coding, highlights, mistakes
 ```
 
-As the 60-day foundation progresses, each problem gets its own folder with all four
-language implementations side by side, plus `java/` and `rust/` directories:
+As the 60-day foundation progresses, each problem gets its own folder in each language
+directory, with shared specs and cross-language checks under `shared/<problem>/`:
 
 ```text
 <lang>/<problem>/        e.g. c/graph_lab, python/graph_lab, java/graph_lab, rust/graph_lab
@@ -243,7 +254,7 @@ language implementations side by side, plus `java/` and `rust/` directories:
 
 ### Directory responsibilities
 
-**`c/`, `python/`** (and later `java/`, `rust/`)
+**`c/`, `java/`, `python/`, `rust/`**
 Source code, one folder per problem, with its tests alongside.
 
 **`book/`**
@@ -420,7 +431,7 @@ The repository contains the bibliography required by the book rather than the co
 
 The educational content is written as Quarto Markdown (`.qmd`) and maintained separately from the source-code implementations.
 
-The authoritative code remains in the language folders (`c/`, `python/`, and later `java/`, `rust/`).
+The authoritative code remains in the language folders (`c/`, `java/`, `python/`, `rust/`).
 
 The book references those source files rather than maintaining unnecessary duplicate copies.
 
