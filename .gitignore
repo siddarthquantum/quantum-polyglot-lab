@@ -46,3 +46,6 @@ c/**/graph
 c/**/graph_traversals
 c/**/array_ops
 c/**/array_ops_exercise
+c/array_basics/array_basics
+rust/array_basics/array_basics
+rust/array_basics/array_basics_test
