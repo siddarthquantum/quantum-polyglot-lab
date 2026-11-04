@@ -216,10 +216,14 @@ quantum-polyglot-lab/
 ├── .github/workflows/ci.yml       # build, tests, CodeQL, secret scanning
 │
 ├── shared/
-│   └── array_basics/              # START HERE: traverse/insert/delete in C, Java, Python, Rust
-│       ├── README.md              # beginner guide: Big-O, complexity table, speed + safety comparison
+│   ├── array_basics/              # START HERE: traverse/insert/delete in C, Java, Python, Rust
+│   │   ├── README.md              # beginner guide: Big-O, complexity table, speed + safety comparison
+│   │   ├── expected_demo.txt      # all four languages must print exactly this
+│   │   └── run_all.sh             # build all 4, verify output, `bench` for timings
+│   └── linked_list/               # THEN HERE: the array's opposite trade-off
+│       ├── README.md              # pointers, Big-O, reverse/middle/Floyd, array-vs-list measured
 │       ├── expected_demo.txt      # all four languages must print exactly this
-│       └── run_all.sh             # build all 4, verify output, `bench` for timings
+│       └── run_all.sh             # build all 4, verify output + checksums, ASan leak check
 │
 ├── c/
 │   ├── array_basics/              # C version of shared/array_basics
@@ -227,15 +231,22 @@ quantum-polyglot-lab/
 │   │   ├── array_ops.c            # exercise file (fill in the TODOs)
 │   │   ├── solution/array_ops.c   # reference solution
 │   │   └── tests/
-│   └── graph_lab/                 # BFS + DFS on an adjacency matrix
-│       ├── graph_traversals.c
-│       └── tests/                 # shared input/expected-output cases + runner
+│   ├── graph_lab/                 # BFS + DFS on an adjacency matrix
+│   │   ├── graph_traversals.c
+│   │   └── tests/                 # shared input/expected-output cases + runner
+│   └── linked_list/               # C version of shared/linked_list
 │
-├── java/array_basics/             # Java version
-├── rust/array_basics/             # Rust version (with unit tests)
+├── java/
+│   ├── array_basics/              # Java version
+│   └── linked_list/               # Java version (LinkedListLab.java)
+│
+├── rust/
+│   ├── array_basics/              # Rust version (with unit tests)
+│   └── linked_list/               # Rust version (with 8 unit tests)
 │
 ├── python/
 │   ├── array_basics/              # Python version
+│   ├── linked_list/               # Python version
 │   └── kmeanLab4/                 # K-Means, DBSCAN, agglomerative clustering
 │
 ├── book/
@@ -586,6 +597,7 @@ Running today on every push and pull request
 | Gate | What it checks |
 |---|---|
 | C build | `gcc -Wall -Wextra -Werror` — any warning fails the build |
+| Four-language parity | `array_basics` and `linked_list` must print byte-identical output in C, Java, Python and Rust, with matching benchmark checksums |
 | C tests | Shared test cases run under AddressSanitizer + UndefinedBehaviorSanitizer |
 | Python | `ruff` lint (incl. bandit-style security rules), formatting, compile check |
 | CodeQL | `security-extended` static analysis for C and Python, plus a weekly re-scan |
