@@ -1,0 +1,14 @@
+# Keep the build context small and the COPY layer free of history and build output.
+.git
+.github
+.claude
+.vscode
+**/__pycache__
+**/*.class
+**/target
+**/*.o
+**/a.out
+
+# Compiled exam-prep binaries (no extension, so the patterns above miss them).
+c/graph_lab/exam_prep/arrayTest
+c/graph_lab/exam_prep/insert
