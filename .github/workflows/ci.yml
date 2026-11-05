@@ -70,6 +70,18 @@ jobs:
       - name: Build all four, compare output, ASan leak check, Rust unit tests
         run: shared/linked_list/run_all.sh
 
+  docker:
+    name: Docker — image builds and runs both lab suites
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t polyglot-lab .
+      - name: Run both lab suites inside the container
+        run: |
+          docker run --rm polyglot-lab shared/array_basics/run_all.sh
+          docker run --rm polyglot-lab shared/linked_list/run_all.sh
+
   python:
     name: Python — lint + compile
     runs-on: ubuntu-latest
