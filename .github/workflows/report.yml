@@ -1,8 +1,10 @@
 name: Containers + report
 
 # Builds the four doubly-linked-list containers, verifies output, checksums and
-# isolation, renders the report page, and (on main only) publishes it to
-# GitHub Pages. On pull requests the page is attached as a build artifact.
+# isolation, renders the report page, then serves it from the local nginx
+# container exactly as tools/report/local.sh does, and fetches it over
+# localhost. Nothing is published; the page is attached to the run as an
+# artifact.
 on:
   push:
     branches: [main]
@@ -18,7 +20,7 @@ concurrency:
 
 jobs:
   containers:
-    name: Four isolated containers — build, verify, measure, render
+    name: Four isolated containers — build, verify, measure, render, serve
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,29 +30,25 @@ jobs:
       - name: Render report
         if: always() && hashFiles('report-data/results.json') != ''
         run: python3 tools/report/build_report.py report-data/results.json --out site
+      - name: Serve on localhost from the hardened nginx container and fetch it
+        run: |
+          compose="docker compose -f docker/doubly_linked_list/compose.yaml --profile report"
+          $compose up -d report
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8080/ -o page.html && break
+            sleep 1
+          done
+          grep -q "<title>Polyglot Lab Report</title>" page.html
+          curl -fsS http://127.0.0.1:8080/results.json | python3 -c "import json, sys; json.load(sys.stdin)"
+          id=$($compose ps -q report)
+          docker inspect "$id" --format 'user={{.Config.User}} read_only={{.HostConfig.ReadonlyRootfs}} caps={{.HostConfig.CapDrop}}' | tee inspect.txt
+          grep -q "read_only=true" inspect.txt
+          grep -q "caps=\[ALL\]" inspect.txt
+          $compose logs report
+          $compose down
       - name: Attach report (download from the run's Summary page)
         if: always() && hashFiles('site/index.html') != ''
         uses: actions/upload-artifact@v4
         with:
           name: report
           path: site
-      - name: Package report for Pages
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-  publish:
-    name: Publish report to GitHub Pages
-    needs: containers
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4

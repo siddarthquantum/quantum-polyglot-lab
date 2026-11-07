@@ -10,7 +10,7 @@ For each language this script:
 
 It exits non-zero if any demo differs, any checksum disagrees across languages,
 or any container is missing a hardening setting. Results go to a JSON file that
-tools/report/build_report.py turns into the published page.
+tools/report/build_report.py turns into the report page.
 
     python3 tools/report/collect.py --out report-data/results.json
 
