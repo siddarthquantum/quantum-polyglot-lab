@@ -13,7 +13,7 @@
 shared/doubly_linked_list/run_all.sh                     # native: parity, ASan leak check, Rust tests, checksums
 shared/doubly_linked_list/run_all.sh bench               # ...plus timings
 docker compose -f docker/doubly_linked_list/compose.yaml up --build    # all four, each in its own container
-python3 tools/report/collect.py --out report-data/results.json        # what CI runs to build the published report
+tools/report/local.sh                                                 # build, verify, report at http://localhost:8080
 ```
 
 ---
@@ -251,19 +251,25 @@ If you are studying protection in operating systems: Linux capabilities split th
 
 ---
 
-## 8. The published report
+## 8. The report, on localhost
 
 ```text
-pull request ─▶ report.yml ─▶ build 4 images ─▶ run demo + bench in each ─▶ docker inspect
-                                                                              │
-                                    collect.py: fail on any mismatch ◀────────┘
-                                              │
-                         build_report.py ─▶ site/index.html + results.json
-                                              │
-              PR: attached as a build artifact      main: deployed to GitHub Pages
+tools/report/local.sh
+   │
+   ├─ collect.py ─▶ build 4 images ─▶ run demo + bench in each ─▶ docker inspect ─▶ fail on any gap
+   ├─ build_report.py ─▶ site/index.html + site/results.json
+   └─ compose --profile report up ─▶ nginx-unprivileged ─▶ http://localhost:8080
 ```
 
-Every number on the page comes from the CI run linked at its top, and `results.json` is published beside it so anyone can check the page against the raw data. The page is static HTML with no scripts and no external requests.
+```bash
+tools/report/local.sh          # build, verify, render, serve
+tools/report/local.sh stop     # stop the viewer
+REPORT_PORT=9000 tools/report/local.sh
+```
+
+The viewer is a fifth container with the same hardening as the other four: non-root (uid 101), read-only root, `noexec` tmpfs, no capabilities, limits. The report is mounted read-only. The port is bound to `127.0.0.1`, so the page is reachable from your machine only, not from other devices on your network. That is the difference between `-p 8080:8080` and `-p 127.0.0.1:8080:8080`, and a good thing to be able to explain.
+
+Every number on the page comes from the run named at its top, and `results.json` is served beside it so the page can be checked against the raw data. The page is static HTML with no scripts and no external requests. CI runs the same steps on every push, starts the viewer, fetches the page over localhost, and attaches it to the run. **Nothing is published.**
 
 ---
 

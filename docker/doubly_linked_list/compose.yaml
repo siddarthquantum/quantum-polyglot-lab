@@ -39,3 +39,22 @@ services:
     <<: *hardened
     image: polyglot-dll-rust
     build: { context: ../.., dockerfile: docker/doubly_linked_list/rust.Dockerfile }
+
+  # The report viewer: serves site/ (built by tools/report/local.sh) at
+  # http://localhost:8080. Only starts with `--profile report`, so a plain
+  # `docker compose up` still runs just the four language containers.
+  report:
+    profiles: [report]
+    image: nginxinc/nginx-unprivileged:1.27-alpine   # runs as uid 101, listens on 8080
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=8m                # nginx's pid file and temp dirs
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 64m
+    volumes:
+      - ../../site:/usr/share/nginx/html:ro          # the report, mounted read-only
+    ports:
+      - "127.0.0.1:${REPORT_PORT:-8080}:8080"        # this machine only, not your Wi-Fi

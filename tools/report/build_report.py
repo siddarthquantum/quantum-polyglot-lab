@@ -280,7 +280,7 @@ which is why its image is larger.</p>
   <li><b>Memory models</b><span>Manual <code>free</code> in C, garbage collection in Java, reference counting in Python, and a generational arena in safe Rust.</span></li>
   <li><b>Tests that prove something</b><span>Byte-identical output, cross-language checksums, ASan + UBSan leak checks, Rust unit tests.</span></li>
   <li><b>Containers and least privilege</b><span>Multi-stage builds, distroless runtimes, non-root, no network, read-only, no capabilities, resource limits.</span></li>
-  <li><b>CI/CD</b><span>GitHub Actions builds, verifies, measures and publishes this page. A red build blocks the merge.</span></li>
+  <li><b>CI/CD</b><span>GitHub Actions builds, verifies and measures everything on this page on every push. A red build blocks the merge.</span></li>
   <li><b>Security</b><span>glibc-style safe unlinking, CWE-416/415/401/835, CodeQL and a secret scan on every push.</span></li>
 </ul>
 
@@ -293,7 +293,7 @@ cd {e(r["repository"].split("/")[-1])}
 docker compose -f docker/doubly_linked_list/compose.yaml build
 docker compose -f docker/doubly_linked_list/compose.yaml run --rm rust        # demo
 docker compose -f docker/doubly_linked_list/compose.yaml run --rm java bench  # benchmark
-python3 tools/report/collect.py --out report-data/results.json             # everything on this page</code></pre>
+tools/report/local.sh                                                       # this page, at http://localhost:8080</code></pre>
 
 <footer>
 <a href="{e(repo_url)}">{e(r["repository"])}</a> · Timings come from a shared CI runner, so they vary from run to run;
