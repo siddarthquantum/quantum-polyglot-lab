@@ -1,0 +1,41 @@
+# Four isolated containers, one per language. Run from the repo root:
+#
+#   docker compose -f docker/doubly_linked_list/compose.yaml build
+#   docker compose -f docker/doubly_linked_list/compose.yaml run --rm c          # demo
+#   docker compose -f docker/doubly_linked_list/compose.yaml run --rm rust bench # benchmark
+#   docker compose -f docker/doubly_linked_list/compose.yaml up                  # all four demos
+#
+# Every service inherits the same hardening from x-hardened. Each line removes
+# something the program does not need -- least privilege, applied to a container.
+name: polyglot-dll
+
+x-hardened: &hardened
+  network_mode: none                  # no network interface except loopback
+  read_only: true                     # root filesystem mounted read-only
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=16m  # the only writable path; nothing in it can execute
+  cap_drop: [ALL]                     # no Linux capabilities, not even the default set
+  security_opt:
+    - no-new-privileges:true          # setuid binaries cannot raise privileges
+  user: "65532:65532"                 # never root
+  pids_limit: 64                      # no fork bombs (the JVM needs ~25 threads)
+  mem_limit: 256m
+  cpus: 1.0
+
+services:
+  c:
+    <<: *hardened
+    image: polyglot-dll-c
+    build: { context: ../.., dockerfile: docker/doubly_linked_list/c.Dockerfile }
+  java:
+    <<: *hardened
+    image: polyglot-dll-java
+    build: { context: ../.., dockerfile: docker/doubly_linked_list/java.Dockerfile }
+  python:
+    <<: *hardened
+    image: polyglot-dll-python
+    build: { context: ../.., dockerfile: docker/doubly_linked_list/python.Dockerfile }
+  rust:
+    <<: *hardened
+    image: polyglot-dll-rust
+    build: { context: ../.., dockerfile: docker/doubly_linked_list/rust.Dockerfile }

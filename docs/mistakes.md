@@ -109,3 +109,43 @@ exactly. A timing comparison is only meaningful once the work is proven equal.
 For any performance comparison, make each implementation produce a value that
 depends on all the work it did, and assert the values are identical. An
 unverified benchmark measures nothing.
+
+---
+
+## 2026-11-07 — I expected the Rust arena to traverse faster than C. It was 2× slower.
+
+**Problem:** doubly linked list, Rust implementation, traversal benchmark.
+
+**What happened**
+
+The arena keeps every node in one `Vec`, so I expected traversal to be at
+least as fast as C's `malloc`'d nodes. The measurement said otherwise:
+
+| | C | Rust arena |
+| --- | --- | --- |
+| traverse, 10 passes over 200k nodes | 4.2–4.8 ms | 8.2–8.6 ms |
+
+**Why it happened**
+
+`std::mem::size_of` gave the answer:
+
+```text
+C Node {int, Node*, Node*}                       24 bytes
+Rust Slot {i32, Option<usize> ×2, u32, bool}     48 bytes   (Option<usize> alone is 16)
+Rust Slot with u32 indices, u32::MAX as nil      16 bytes
+```
+
+Each step reads twice as much memory as C, through a bounds-checked index.
+Contiguous storage does not help if each element is twice the size.
+
+**How it was handled**
+
+The 48-byte layout stays, because `Option<usize>` makes the "no neighbour"
+case impossible to forget, which matters more in a teaching file. The
+16-byte layout is written up in the guide as the way to buy the speed back.
+
+**Lesson**
+
+"Contiguous, so cache-friendly" is a hypothesis, not a result. Measure, then
+look at the layout. `size_of` is a one-line experiment that explains a 2× gap.
+

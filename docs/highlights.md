@@ -15,6 +15,9 @@ Linked list push_back (no tail)→ O(n)      O(1) if a tail pointer is kept
 Linked list reverse            → O(n) time, O(1) space   (prev/cur/next flip)
 Linked list middle             → O(n) time, O(1) space   (tortoise and hare)
 Floyd cycle detection          → O(n) time, O(1) space   (beats a visited set)
+Doubly linked push/pop both ends → O(1)  (head + tail pointers)
+Doubly linked remove HELD node → O(1)      predecessor is one pointer away
+Doubly linked get(i)           → O(min(i, n−i))  walk from the nearer end; still O(n)
 BFS / DFS                      → O(V + E)
 Binary search                  → O(log n)
 ```
@@ -67,4 +70,29 @@ CWE-476  NULL dereference      ← missing empty / end-of-list check
 CWE-835  infinite loop         ← a cycle turns every traversal into a hang
 CWE-787  out-of-bounds write   ← the classic unchecked array index
 CWE-125  out-of-bounds read
+```
+
+## Doubly linked list
+
+```text
+Invariant       → a.next == b  ⇔  b.prev == a, at every link
+Why it exists   → O(1) removal of a node you HOLD (LRU cache = hash map + doubly linked list)
+Memory          → 24 B per int node in C (6× an array); Rust arena slot 48 B (Option<usize> = 16 B)
+Safe unlink     → check prev->next == node && next->prev == node BEFORE writing
+                  (glibc: "corrupted double-linked list"; stops the unlink write primitive)
+Rust            → a node has two parents, so no Box. Options: Rc/Weak, unsafe, or an arena
+Arena bug       → reused slot + old index = logic-level use-after-free; fix: generational index
+```
+
+## Container hardening
+
+```text
+user 65532            → never root                   (least privilege)
+network_mode: none    → no exfiltration, no download
+read_only: true       → nothing on the root fs can be modified
+cap_drop: [ALL]       → root's powers split into capabilities, all revoked
+no-new-privileges     → setuid binaries cannot raise privileges
+pids / memory / cpus  → cgroup limits: no fork bomb, no starving the host
+multi-stage + distroless → compilers and shells never reach the runtime image
+Verify, don't trust   → read settings back with docker inspect; fail the build on a gap
 ```
