@@ -7,3 +7,7 @@ select = ["E", "F", "I", "B", "S"]
 ignore = [
     "E402", # matplotlib.use() must run before importing pyplot
 ]
+
+[lint.per-file-ignores]
+# Most of this file is an HTML/CSS template; wrapping markup to 100 columns hurts readability.
+"tools/report/build_report.py" = ["E501"]
